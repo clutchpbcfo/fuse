@@ -1,0 +1,8 @@
+name = "fuse-api"
+main = "worker.js"
+compatibility_date = "2026-06-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "fuse-leaderboard"
+database_id = "766e99db-f56c-4b51-a202-488e0223b8ea"

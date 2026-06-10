@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300">
+  <defs>
+    <linearGradient id="wm" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="14%" stop-color="#ffffff"/><stop offset="88%" stop-color="#FF8A1E"/>
+    </linearGradient>
+    <radialGradient id="sp" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/><stop offset="45%" stop-color="#FF8A1E"/>
+      <stop offset="100%" stop-color="#FF8A1E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="900" height="300" fill="#07070e"/>
+  <text x="450" y="172" text-anchor="middle" font-family="'Chakra Petch','Arial Black',Arial,sans-serif" font-weight="700" font-size="150" letter-spacing="10" fill="url(#wm)">FUSE</text>
+  <line x1="285" y1="206" x2="500" y2="206" stroke="#241a10" stroke-width="8" stroke-linecap="round"/>
+  <line x1="500" y1="206" x2="615" y2="206" stroke="#6E5D4B" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="500" cy="206" r="26" fill="url(#sp)"/>
+  <circle cx="500" cy="206" r="8" fill="#ffffff"/>
+  <text x="450" y="262" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="800" font-size="26" letter-spacing="14" fill="#F3F3FB" opacity="0.82">CUT IT CLOSE.</text>
+</svg>
