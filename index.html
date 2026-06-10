@@ -100,10 +100,48 @@
   #lbme{ margin-top:10px; font-size:13px; font-weight:800; opacity:.85; min-height:1em; }
   #rank{ font-size:14px; font-weight:800; min-height:1em; letter-spacing:.5px; }
   .credit{ position:fixed; bottom:2.2vh; left:0; right:0; text-align:center; font-size:11px; letter-spacing:1px; opacity:.3; z-index:6; }
+
+  /* --- duel (arcade-pvp) --- */
+  #duel-btn{ background:rgba(255,138,30,.13); color:var(--accent); box-shadow:none; border:1.5px solid rgba(255,138,30,.45); }
+  #duel-status{ margin-top:18px; font-size:clamp(13px,3.8vw,18px); font-weight:800; letter-spacing:1.5px; min-height:1.3em; }
+  #duel-sub{ margin-top:6px; font-size:12px; font-weight:700; letter-spacing:1px; opacity:.6; min-height:1em; }
+  .pulse-txt{ animation:dpulse 1.1s ease-in-out infinite; }
+  @keyframes dpulse{ 0%,100%{ opacity:.45 } 50%{ opacity:1 } }
+  #duel-name{ margin-top:18px; width:min(78vw,300px); padding:14px 16px; border-radius:14px; border:2px solid rgba(255,255,255,.15); background:rgba(255,255,255,.06); color:#fff; font-size:18px; font-weight:800; letter-spacing:1px; text-align:center; outline:none; }
+  #duel-name:focus{ border-color:var(--accent); }
+  #duel-name-note{ margin-top:8px; font-size:12px; font-weight:700; opacity:.7; min-height:1em; }
+  #duel-verdict{ font-size:clamp(30px,10vw,64px); font-weight:700; letter-spacing:2px; min-height:1.1em; filter:drop-shadow(0 0 18px rgba(0,0,0,.5)); }
+  .duelrows{ margin-top:16px; width:min(86vw,360px); display:flex; flex-direction:column; gap:8px; }
+  .duelrow{ display:flex; align-items:center; justify-content:space-between; gap:12px; background:rgba(255,255,255,.05); border-radius:12px; padding:12px 16px; font-size:15px; font-weight:800; letter-spacing:1px; }
+  .duelrow .dnm{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .duelrow .dsc{ color:var(--accent); font-weight:900; }
+  .duelrow.win{ background:rgba(255,138,30,.16); border:1px solid rgba(255,138,30,.55); }
+  .duelrow.win .dsc{ color:var(--gold); }
+  #duelend-note{ margin-top:12px; font-size:12px; font-weight:700; letter-spacing:1px; opacity:.6; min-height:1em; }
 </style>
 </head>
 <body>
 <canvas id="game"></canvas>
+
+<div id="fuseintro-splash" style="position:fixed;inset:0;z-index:2147483600;background:#07070e;display:flex;align-items:center;justify-content:center;overflow:hidden">
+<style>@keyframes icPulse{0%,100%{transform:scale(1);box-shadow:0 0 36px rgba(255,138,30,.5)}50%{transform:scale(1.05);box-shadow:0 0 52px rgba(255,138,30,.8)}}</style>
+<video id="fuseintro-vid" src="fuse-intro.mp4" playsinline preload="auto" style="width:100%;height:100%;object-fit:contain;background:#07070e"></video>
+<div id="fuseintro-gate" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:radial-gradient(circle at 50% 42%,rgba(255,138,30,.14),rgba(7,7,14,.86))">
+<button id="fuseintro-start" style="padding:18px 46px;border:2px solid #FF8A1E;border-radius:999px;background:rgba(255,138,30,.16);color:#fff;font:700 22px 'Chakra Petch',system-ui,sans-serif;letter-spacing:3px;cursor:pointer;box-shadow:0 0 36px rgba(255,138,30,.5);animation:icPulse 1.6s ease-in-out infinite">&#9654; LIGHT IT UP</button>
+</div>
+<button id="fuseintro-skip" style="position:absolute;bottom:24px;right:24px;padding:9px 18px;border:1px solid rgba(255,255,255,.3);border-radius:999px;background:rgba(0,0,0,.4);color:#fff;font:600 13px system-ui,sans-serif;letter-spacing:1px;cursor:pointer;opacity:.5">SKIP &#9654;</button>
+</div>
+<script>
+(function(){var o=document.getElementById('fuseintro-splash');if(!o)return;
+function reveal(){if(!o)return;var x=o;o=null;x.style.transition='opacity .55s ease';x.style.opacity='0';setTimeout(function(){if(x&&x.parentNode)x.parentNode.removeChild(x);},600);try{localStorage.setItem('fuseintroSeen','1');}catch(e){}try{if(window.musicUnlock)musicUnlock();}catch(e){}}
+try{if(localStorage.getItem('fuseintroSeen')||sessionStorage.getItem('fuseintroSeen')){if(o.parentNode)o.parentNode.removeChild(o);o=null;return;}}catch(e){}
+var v=document.getElementById('fuseintro-vid'),gate=document.getElementById('fuseintro-gate'),sk=document.getElementById('fuseintro-skip'),st=document.getElementById('fuseintro-start');
+if(v){v.addEventListener('ended',reveal);v.addEventListener('error',function(){reveal();});}
+function start(){if(gate)gate.style.display='none';if(v){v.muted=false;v.volume=1;try{v.currentTime=0;}catch(e){}var p=v.play&&v.play();if(p&&p.catch)p.catch(function(){v.muted=true;v.play&&v.play();});}}
+if(st)st.addEventListener('click',start);
+if(sk)sk.addEventListener('click',reveal);
+})();
+</script>
 
 <div id="hud" class="hidden">
   <div id="box">BOX 0</div>
@@ -121,6 +159,7 @@
   <div class="menu">
     <button id="daily">DAILY BOX #<span id="dayno">1</span></button>
     <button id="endless" class="ghost">ENDLESS</button>
+    <button id="duel-btn" style="display:none">DUEL</button>
     <button id="board-btn" class="ghost">LEADERBOARD</button>
     <button id="locker-btn" class="ghost">LOCKER</button>
     <button id="profile-btn" class="ghost">PROFILE</button>
@@ -179,6 +218,36 @@
   <div id="lblist">loading&hellip;</div>
   <div id="lbme"></div>
   <button id="board-close" class="ghost" style="margin-top:18px">CLOSE</button>
+</div>
+
+<div id="duel" class="overlay hidden">
+  <div class="logo ck" style="font-size:clamp(40px,13vw,92px)">DUEL</div>
+  <div class="tag">same box &middot; same fuses &middot; higher verified score wins</div>
+  <div id="duel-name-row" class="hidden">
+    <input id="duel-name" maxlength="15" placeholder="yourtag" autocomplete="off" autocapitalize="off" spellcheck="false" />
+    <div id="duel-name-note"></div>
+  </div>
+  <div id="duel-status"></div>
+  <div id="duel-sub"></div>
+  <div class="fuseline" id="duel-fuseline" style="visibility:hidden"><b></b><i></i></div>
+  <div class="menu">
+    <button id="duel-go">FIND A DUEL</button>
+    <button id="duel-cancel" class="ghost">BACK</button>
+  </div>
+</div>
+
+<div id="duelend" class="overlay hidden">
+  <div id="duel-verdict" class="ck"></div>
+  <div id="duelend-sub" class="tag"></div>
+  <div class="duelrows">
+    <div class="duelrow" id="drow-me"><span class="dnm"></span><span class="dsc"></span></div>
+    <div class="duelrow" id="drow-op"><span class="dnm"></span><span class="dsc"></span></div>
+  </div>
+  <div id="duelend-note"></div>
+  <div class="btns" style="margin-top:14px">
+    <button id="duel-rematch">REMATCH</button>
+    <button id="duel-menu" class="ghost">MENU</button>
+  </div>
 </div>
 
 <button id="mute">&#128266;</button>
@@ -252,9 +321,13 @@ function actx(){ try{ if(!AC) AC=new (window.AudioContext||window.webkitAudioCon
 function blip(freq,dur,type,vol){ try{ const a=actx(); if(!a) return; const o=a.createOscillator(),g=a.createGain(); o.type=type||'triangle'; o.frequency.value=freq; o.connect(g); g.connect(sfxBus||a.destination); const t=a.currentTime; g.gain.setValueAtTime(vol||0.2,t); g.gain.exponentialRampToValueAtTime(0.0001,t+(dur||0.09)); o.start(t); o.stop(t+(dur||0.09)); }catch(e){} }
 function buzz(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms); }catch(e){} }
 
-const PENT=[0,3,5,7,10]; const ROOTS=[0,-2,0,-4,0,-2,3,-4]; const ARP=[0,-1,2,-1,1,-1,3,-1,2,-1,4,2,1,-1,0,-1];
-let MUSIC_ROOT=0;
-function scaleFreq(deg,oct){ const o=Math.floor(deg/5); const d=((deg%5)+5)%5; const midi=41+MUSIC_ROOT+(oct||0)*12+o*12+PENT[d]; return 440*Math.pow(2,(midi-69)/12); }
+/* ---------------- FUSE SCORE — heist-timer menace ------------------
+   Unique to FUSE: detuned drone, phrygian pluck ostinato, clock ticks,
+   heartbeat, box stabs, danger riser. (No pentatonic delay-arps, no
+   four-on-the-floor, no delay wash — that's PULSE's sound. This one ticks.) */
+const PHRY=[0,1,5,7,8,12];
+const BASSPAT=[0,null,null,0, null,null,1,null, 0,null,7,null, 8,null,7,null];
+function fuseSemi(semi,oct){ return 440*Math.pow(2,((38+semi+(oct||0)*12)-69)/12); }
 const M={ on:false, muted:false, bpm:84, step:0, bar:0, nextT:0, timer:null, level:0, streak:0, playing:false };
 let _noise=null;
 function noiseBuf(a){ if(_noise) return _noise; const b=a.createBuffer(1,Math.floor(a.sampleRate*0.2),a.sampleRate); const d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; _noise=b; return b; }
@@ -262,27 +335,49 @@ function env(g,t,peak,atk,dur){ g.gain.setValueAtTime(0.0001,t); g.gain.linearRa
 function musicInit(){ const a=actx(); if(!a) return false; if(masterGain) return true;
   masterGain=a.createGain(); masterGain.gain.value=M.muted?0:1; masterGain.connect(a.destination);
   musicBus=a.createGain(); musicBus.gain.value=0; musicBus.connect(masterGain);
-  sfxBus=a.createGain(); sfxBus.gain.value=0.9; sfxBus.connect(masterGain);
-  fxDelay=a.createDelay(0.6); fxDelay.delayTime.value=0.26; const fb=a.createGain(); fb.gain.value=0.26; fxDelay.connect(fb); fb.connect(fxDelay);
-  const wet=a.createGain(); wet.gain.value=0.5; fxDelay.connect(wet); wet.connect(musicBus); return true; }
-function padVoice(t,dur){ const a=actx(); if(!a||!musicBus) return; [scaleFreq(0,0),scaleFreq(2,0),scaleFreq(4,0)].forEach((f,i)=>{ const o=a.createOscillator(),g=a.createGain(),lp=a.createBiquadFilter();
-  o.type='sawtooth'; o.frequency.value=f; o.detune.value=(i-1)*7; lp.type='lowpass'; lp.frequency.value=700+M.level*220; o.connect(lp); lp.connect(g); g.connect(musicBus); env(g,t,0.04,dur*0.4,dur); o.start(t); o.stop(t+dur+0.05); }); }
-function bassNote(t,dur){ const a=actx(); if(!a||!musicBus) return; const o=a.createOscillator(),g=a.createGain(); o.type='triangle'; o.frequency.value=scaleFreq(0,-1); o.connect(g); g.connect(musicBus); env(g,t,0.24,0.01,dur); o.start(t); o.stop(t+dur+0.03); }
-function arpNote(t,f,dur,vol){ const a=actx(); if(!a||!musicBus) return; const o=a.createOscillator(),g=a.createGain(),lp=a.createBiquadFilter(); o.type='sawtooth'; o.frequency.value=f; lp.type='lowpass'; lp.frequency.value=1100+M.level*650+(M.playing?M.streak*22:0); o.connect(lp); lp.connect(g); g.connect(musicBus); g.connect(fxDelay); env(g,t,vol,0.005,dur); o.start(t); o.stop(t+dur+0.03); }
-function kick(t){ const a=actx(); if(!a||!musicBus) return; const o=a.createOscillator(),g=a.createGain(); o.type='sine'; o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(42,t+0.12); g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(0.5,t+0.005); g.gain.exponentialRampToValueAtTime(0.0001,t+0.18); o.connect(g); g.connect(musicBus); o.start(t); o.stop(t+0.2); }
-function hat(t,vol){ const a=actx(); if(!a||!musicBus) return; const s=a.createBufferSource(); s.buffer=noiseBuf(a); const hp=a.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=7000; const g=a.createGain(); g.gain.setValueAtTime(vol*0.15,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.05); s.connect(hp); hp.connect(g); g.connect(musicBus); s.start(t); s.stop(t+0.06); }
-function tickTock(t){ const a=actx(); if(!a||!musicBus) return; const o=a.createOscillator(),g=a.createGain(),bp=a.createBiquadFilter(); o.type='square'; o.frequency.value=1300; bp.type='bandpass'; bp.frequency.value=1300; o.connect(bp); bp.connect(g); g.connect(musicBus); g.gain.setValueAtTime(0.05,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.03); o.start(t); o.stop(t+0.04); }
+  sfxBus=a.createGain(); sfxBus.gain.value=0.9; sfxBus.connect(masterGain); return true; }
+function droneVoice(t,dur){ const a=actx(); if(!a||!musicBus) return;
+  [[0,-7],[0,7],[7,-4],[7,5]].forEach(pr=>{ const o=a.createOscillator(),g=a.createGain(),lp=a.createBiquadFilter();
+    o.type='sawtooth'; o.frequency.value=fuseSemi(pr[0],-1); o.detune.value=pr[1];
+    lp.type='lowpass'; lp.frequency.value=240+M.level*110;
+    o.connect(lp); lp.connect(g); g.connect(musicBus); env(g,t,0.026,dur*0.5,dur); o.start(t); o.stop(t+dur+0.05); }); }
+function pluckBass(t,semi,vel){ const a=actx(); if(!a||!musicBus) return;
+  const o=a.createOscillator(),g=a.createGain(),lp=a.createBiquadFilter();
+  o.type='sawtooth'; o.frequency.value=fuseSemi(semi,0); lp.type='lowpass'; lp.frequency.value=420+M.level*160;
+  o.connect(lp); lp.connect(g); g.connect(musicBus); env(g,t,0.2*(vel||1),0.004,0.16); o.start(t); o.stop(t+0.2);
+  const o2=a.createOscillator(),g2=a.createGain(); o2.type='sine'; o2.frequency.value=fuseSemi(semi,-1);
+  o2.connect(g2); g2.connect(musicBus); env(g2,t,0.13*(vel||1),0.004,0.18); o2.start(t); o2.stop(t+0.22); }
+function tick(t,hard){ const a=actx(); if(!a||!musicBus) return;
+  const sN=a.createBufferSource(); sN.buffer=noiseBuf(a); const hp=a.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=hard?4600:6400;
+  const g=a.createGain(); g.gain.setValueAtTime(hard?0.085:0.045,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.03);
+  sN.connect(hp); hp.connect(g); g.connect(musicBus); sN.start(t); sN.stop(t+0.04);
+  if(hard){ const o=a.createOscillator(),g2=a.createGain(); o.type='square'; o.frequency.value=2050;
+    g2.gain.setValueAtTime(0.03,t); g2.gain.exponentialRampToValueAtTime(0.0001,t+0.02); o.connect(g2); g2.connect(musicBus); o.start(t); o.stop(t+0.025); } }
+function heartbeat(t){ const a=actx(); if(!a||!musicBus) return;
+  [[0,0.34,0.10],[0.16,0.24,0.12]].forEach(hh=>{ const o=a.createOscillator(),g=a.createGain();
+    o.type='sine'; o.frequency.setValueAtTime(72,t+hh[0]); o.frequency.exponentialRampToValueAtTime(44,t+hh[0]+hh[2]);
+    g.gain.setValueAtTime(0.0001,t+hh[0]); g.gain.linearRampToValueAtTime(hh[1],t+hh[0]+0.006); g.gain.exponentialRampToValueAtTime(0.0001,t+hh[0]+hh[2]+0.06);
+    o.connect(g); g.connect(musicBus); o.start(t+hh[0]); o.stop(t+hh[0]+hh[2]+0.1); }); }
+function boxStab(){ const a=actx(); if(!a||!musicBus) return; const t=a.currentTime+0.02;
+  [0,1,7].forEach(semi=>{ const o=a.createOscillator(),g=a.createGain(),lp=a.createBiquadFilter();
+    o.type='sawtooth'; o.frequency.value=fuseSemi(semi,1); lp.type='lowpass'; lp.frequency.value=950;
+    o.connect(lp); lp.connect(g); g.connect(musicBus); env(g,t,0.075,0.006,0.3); o.start(t); o.stop(t+0.34); });
+  tick(t,true); }
 function musicSchedule(s,t){ const sd=60/M.bpm/4, lvl=M.level, playing=M.playing;
-  if(s%16===0){ M.bar=(M.bar+1)%8; MUSIC_ROOT=ROOTS[M.bar%ROOTS.length]; padVoice(t,sd*16*0.98); }
-  if(playing && s%4===0) bassNote(t,sd*2.0);
-  if(playing && lvl>=1 && s%4===0) kick(t);
-  if(playing && lvl>=2 && s%2===1) hat(t, lvl>=4?0.8:0.55);
-  if(playing && lvl>=5 && s%4===2) tickTock(t);
-  const note=ARP[s%16]; if(note>=0){ const dens=playing?(0.5+0.14*Math.min(lvl,4)):0.45; if(Math.random()<dens){ const oct=(playing&&lvl>=3)?1:0; arpNote(t,scaleFreq(note,oct),sd*1.4,0.05+0.013*Math.min(lvl,4)); } } }
+  if(s%32===0) droneVoice(t,sd*32*0.98);
+  if(playing){
+    const bnote=BASSPAT[s%16]; if(bnote!==null) pluckBass(t,bnote,1);
+    if(s%4===0) tick(t, s%16===0);
+    if(lvl>=2 && s%16===0) heartbeat(t);
+    if(lvl>=3 && s%2===1) tick(t,false);
+    if(lvl>=5 && s%16===10) pluckBass(t,13,0.7);
+  } else {
+    if(s%8===4 && Math.random()<0.3) pluckBass(t,[0,7,8][Math.floor(Math.random()*3)],0.45);
+  } }
 function musicScheduler(){ const a=actx(); if(!a||!M.on) return; while(M.nextT < a.currentTime+0.25){ musicSchedule(M.step,M.nextT); M.nextT+=60/M.bpm/4; M.step=(M.step+1)%64; } M.timer=setTimeout(musicScheduler,40); }
 function musicStart(){ if(M.on) return; if(!musicInit()) return; M.on=true; M.nextT=actx().currentTime+0.06; musicScheduler(); }
 function musicLevel(target,time){ const a=actx(); if(!a||!musicBus) return; musicBus.gain.cancelScheduledValues(a.currentTime); musicBus.gain.setValueAtTime(Math.max(0.0001,musicBus.gain.value),a.currentTime); musicBus.gain.linearRampToValueAtTime(target,a.currentTime+(time||0.5)); }
-function musicSet(box,streak,playing){ M.level=box; M.streak=streak; M.playing=playing; M.bpm = playing ? Math.min(160, 92+box*6) : 84; }
+function musicSet(box,streak,playing){ M.level=box; M.streak=streak; M.playing=playing; M.bpm = playing ? Math.min(150, 88+box*5) : 84; }
 function musicUnlock(){ musicStart(); if(mode!=='playing') musicLevel(0.2,0.8); }
 function musicGame(){ musicStart(); M.playing=true; musicLevel(0.48,0.4); }
 function musicMenu(){ musicStart(); musicSet(0,0,false); musicLevel(0.2,0.6); }
@@ -307,7 +402,16 @@ function sizzleStop(lane){ const z=sizzles[lane]; if(!z) return; sizzles[lane]=n
   try{ const a=actx(),t=a.currentTime; z.g.gain.cancelScheduledValues(t); z.g.gain.setValueAtTime(Math.max(0.0001,z.g.gain.value),t); z.g.gain.exponentialRampToValueAtTime(0.0001,t+0.06);
   z.wg.gain.cancelScheduledValues(t); z.wg.gain.setValueAtTime(Math.max(0.0001,z.wg.gain.value),t); z.wg.gain.exponentialRampToValueAtTime(0.0001,t+0.06);
   setTimeout(()=>{ try{z.src.stop();}catch(e){} try{z.wh.stop();}catch(e){} },120); }catch(e){} }
-function sizzleUpdate(){ if(!S||!S.sim||M.muted) return; for(let i=0;i<4;i++){ const z=sizzles[i]; if(!z) continue; const f=S.sim.fuses[i];
+let TEN=null;
+function tensionInit(){ const a=actx(); if(!a||!masterGain||TEN) return; try{
+  const src=a.createBufferSource(); src.buffer=noiseBuf(a); src.loop=true;
+  const bp=a.createBiquadFilter(); bp.type='bandpass'; bp.Q.value=2.2; bp.frequency.value=320;
+  const g=a.createGain(); g.gain.value=0.0001;
+  src.connect(bp); bp.connect(g); g.connect(masterGain); src.start(); TEN={bp:bp,g:g}; }catch(e){} }
+function sizzleUpdate(){ if(!S||!S.sim||M.muted) return;
+  let mxp=0; for(let i=0;i<4;i++){ const f0=S.sim.fuses[i]; if(f0){ const pp=SIM.progressAt(f0,S.gt); if(pp>mxp) mxp=pp; } }
+  tensionInit(); if(TEN){ const lift=Math.max(0,(mxp-0.7)/0.3); try{ TEN.g.gain.value=(mode==='playing'&&S&&!S.over)?lift*lift*0.05:0.0001; TEN.bp.frequency.value=320+mxp*2200; }catch(e){} }
+  for(let i=0;i<4;i++){ const z=sizzles[i]; if(!z) continue; const f=S.sim.fuses[i];
   if(!f){ sizzleStop(i); continue; }
   const p=SIM.progressAt(f,S.gt), fl=f.ti===1?1.35:1;
   try{ z.bp.frequency.value=(500+p*2600)*fl; z.g.gain.value=Math.min(0.085,0.014+p*0.07);
@@ -315,11 +419,11 @@ function sizzleUpdate(){ if(!S||!S.sim||M.muted) return; for(let i=0;i<4;i++){ c
 function sizzleKillAll(){ for(let i=0;i<4;i++) sizzleStop(i); }
 function snipSound(p,label,ti){
   if(label==='COLD'){ blip(110,0.12,'square',0.16); return; }
-  const deg=2+Math.floor(p*6);
+  const deg=Math.min(5,Math.floor(p*6));
   blipNoise(0.05,2600,0.22);
-  blip(scaleFreq(deg,1),0.12,'triangle',0.22);
-  if(p>=0.92){ const a=actx(); if(a){ const t0=a.currentTime; [0,1,2].forEach(k=>{ setTimeout(()=>blip(scaleFreq(deg+k+1,1),0.1,'sine',0.18),k*55); }); } }
-  if(ti===2&&p>=0.95){ blip(scaleFreq(9,2),0.3,'sine',0.2); }
+  blip(fuseSemi(PHRY[deg],2),0.12,'triangle',0.22);
+  if(p>=0.92){ [1,2,3].forEach(k=>{ setTimeout(()=>blip(fuseSemi(PHRY[Math.min(5,deg+k)],2),0.1,'sine',0.18),k*55); }); }
+  if(ti===2&&p>=0.95){ blip(fuseSemi(12,2),0.3,'sine',0.2); }
 }
 function blipNoise(dur,freq,vol){ try{ const a=actx(); if(!a) return; const s=a.createBufferSource(); s.buffer=noiseBuf(a); const hp=a.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=freq; const g=a.createGain(); const t=a.currentTime; g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur); s.connect(hp); hp.connect(g); g.connect(sfxBus||a.destination); s.start(t); s.stop(t+dur+0.02); }catch(e){} }
 function boomSound(){ try{ const a=actx(); if(!a) return; const t=a.currentTime;
@@ -347,7 +451,7 @@ function drawParts(){ for(const p of parts){ ctx.globalAlpha=Math.max(0,Math.min
 function popup(x,y,txt,col,big){ popups.push({x,y,txt,col,t:1,big:big||false}); }
 function updatePopups(dt){ for(let i=popups.length-1;i>=0;i--){ const p=popups[i]; p.t-=dt*1.05; p.y-=dt*46; if(p.t<=0) popups.splice(i,1); } }
 function drawPopups(){ for(const p of popups){ ctx.globalAlpha=Math.max(0,Math.min(1,p.t*1.4)); ctx.fillStyle=p.col; ctx.textAlign='center'; ctx.font='900 '+(p.big?Math.round(GEO.laneH*0.42):Math.round(GEO.laneH*0.30))+'px -apple-system,system-ui,Arial'; ctx.fillText(p.txt,p.x,p.y); } ctx.globalAlpha=1; }
-function hexA(hex,a){ if(hex[0]!=='#') return 'rgba(255,255,255,'+a+')'; const n=parseInt(hex.slice(1),16); return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')'; }
+function hexA(hex,a){ if(hex[0]!=='#') return 'rgba(255,255,255,'+a+')'; let h=hex.slice(1); if(h.length===3) h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2]; const n=parseInt(h,16); return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')'; }
 
 function laneY(i){ return GEO.bandTop+GEO.laneH*(i+0.5); }
 function cordPoint(i,u){ const y=laneY(i), x0=GEO.x0, x1=GEO.xEnd; const cxp=(x0+x1)/2, cyp=y+GEO.laneH*0.15;
@@ -433,7 +537,7 @@ function saveName(n){ try{ localStorage.setItem('fuse_name',n); }catch(e){} }
 function newRun(kind,seed){
   const sd=(seed!=null)?(seed>>>0):SIM.hashSeed('endless-'+Date.now()+'-'+Math.random());
   const sim=new SIM.Sim(sd);
-  S={ kind, seed:sd, sim, gt:0, log:[], over:false,
+  S={ kind, seed:sd, sim, gt:0, log:[], over:false, lastBox:0,
       challengeTarget:(kind==='challenge'&&pendingChallenge)?pendingChallenge.t:null,
       challengerName:(kind==='challenge'&&pendingChallenge)?pendingChallenge.n:null };
   sim.onEvent=(ev,data)=>{
@@ -444,7 +548,7 @@ function newRun(kind,seed){
   shake=0; flashA=0; parts.length=0; popups.length=0; stubs.length=0; timeScale=1; deathAnimT=0;
 }
 function beginRun(kind,seed){ actx(); mode='playing';
-  ['title','intro','dead','locker','profile','board'].forEach(id=>el(id).classList.add('hidden'));
+  ['title','intro','dead','locker','profile','board','duel','duelend'].forEach(id=>el(id).classList.add('hidden'));
   el('hud').classList.remove('hidden');
   newRun(kind,seed); musicStart(); musicSet(0,0,true); musicGame();
   el('hint').style.opacity='0.75'; setTimeout(()=>{ if(mode==='playing') hideHint(); },3600);
@@ -453,13 +557,13 @@ function startDaily(){ pendingChallenge=null; beginRun('daily',SIM.dailySeed(SIM
 function startEndless(){ pendingChallenge=null; beginRun('endless',null); }
 function startChallenge(){ if(!pendingChallenge) return startEndless(); beginRun('challenge',pendingChallenge.s>>>0); }
 function hideHint(){ el('hint').style.opacity='0'; }
-function gotoTitle(){ mode='title'; sizzleKillAll(); ['dead','intro','locker','hud'].forEach(id=>el(id).classList.add('hidden')); el('title').classList.remove('hidden'); el('tbest').textContent=best; el('tcut').textContent=profile.bestCutEver>0?(profile.bestCutEver/10)+'%':'—'; refreshTitleProfile(); musicMenu(); }
+function gotoTitle(){ mode='title'; sizzleKillAll(); ['dead','intro','locker','hud','duel','duelend'].forEach(id=>el(id).classList.add('hidden')); el('title').classList.remove('hidden'); el('tbest').textContent=best; el('tcut').textContent=profile.bestCutEver>0?(profile.bestCutEver/10)+'%':'—'; refreshTitleProfile(); musicMenu(); }
 function showDead(){ mode='dead'; el('hud').classList.add('hidden'); el('dead').classList.remove('hidden'); requestAnimationFrame(()=>{ el('xpfill').style.width=lastXpPct+'%'; }); }
 function syncHUD(){ const sim=S.sim; el('score').textContent=sim.score; el('streak').textContent='STREAK '+sim.streak;
   el('mult').textContent='x'+((1+SCFG.streakStep*Math.min(sim.streak,SCFG.streakCap))*(1)).toFixed(2).replace(/\.?0+$/,'');
-  const label=S.kind==='daily'?('DAILY #'+SIM.dayNumber()):S.kind==='challenge'?'CHALLENGE':'ENDLESS';
+  const label=S.kind==='daily'?('DAILY #'+SIM.dayNumber()):S.kind==='challenge'?'CHALLENGE':S.kind==='duel'?'DUEL':'ENDLESS';
   el('box').innerHTML=label+'<br>BOX '+SIM.levelAt(S.gt);
-  el('best2').textContent=(S.kind==='challenge'&&S.challengeTarget!=null)?('BEAT '+S.challengeTarget):('BEST '+Math.max(best,sim.score));
+  el('best2').textContent=(S.kind==='duel'&&DUEL.opp)?('VS @'+String(DUEL.opp).toUpperCase()):(S.kind==='challenge'&&S.challengeTarget!=null)?('BEAT '+S.challengeTarget):('BEST '+Math.max(best,sim.score));
   musicSet(SIM.levelAt(S.gt),sim.streak,true);
   const sc=el('score'); sc.style.transform='scale(1.1)'; setTimeout(()=>sc.style.transform='scale(1)',80); }
 function showBig(txt,color){ bigText=txt; bigColor=color||'#fff'; bigT=1; }
@@ -508,6 +612,7 @@ function finalizeDeath(){
     maxStreak:sim.maxStreak, lvl:SIM.levelAt(sim.deathT), kind:S.kind, day:SIM.dayNumber(),
     beat, target:S.challengeTarget, name:S.challengerName, seed:S.seed, newBest:allBest };
   lastStats=run;
+  if(S.kind==='duel'){ applyRun(run); duelSubmitRun(run); return; }
   drawShareCard(run);
   const summary=applyRun(run);
   populateXp(summary); submitScore();
@@ -544,7 +649,7 @@ function drawShareCard(s){
   x.textAlign='right'; x.fillStyle=acc; x.font='800 40px -apple-system,system-ui,Arial'; x.fillText('LV '+levelInfo(profile.xp).level, w-60, 120); x.textAlign='center';
   cardWick(x,w/2,h*0.27,108,skinColor());
   const modeTxt=s.kind==='daily'?('DAILY BOX #'+s.day):s.kind==='challenge'?'CHALLENGE':'ENDLESS';
-  x.fillStyle=acc; x.font='800 48px -apple-system,system-ui,Arial'; x.fillText(modeTxt,w/2,h*0.418);
+  x.fillStyle=acc; x.font='800 48px -apple-system,system-ui,Arial'; x.fillText(modeTxt,w/2,h*0.435);
   const sLen=String(s.score).length, fs=sLen>5?230:sLen>4?290:340;
   x.fillStyle='#fff'; x.font='900 '+fs+'px -apple-system,system-ui,Arial'; x.fillText(String(s.score),w/2,h*0.55);
   x.fillStyle='rgba(255,255,255,.55)'; x.font='800 42px -apple-system,system-ui,Arial'; x.fillText('SCORE',w/2,h*0.592);
@@ -573,7 +678,7 @@ function toast(msg){ const t=el('toast'); t.textContent=msg; t.classList.remove(
 function onChallenge(){ if(!playerName){ let n=''; try{ n=(window.prompt('Your name / handle for the challenge:')||'').trim(); }catch(e){} if(n){ playerName=n; saveName(n); } } const url=makeLink(); const text=lastStats.kind==='daily'?('Beat my FUSE Daily Box #'+lastStats.day+': '+lastStats.score):('Beat my FUSE score: '+lastStats.score); if(navigator.share){ navigator.share({title:'FUSE',text:text,url:url}).catch(()=>{ copy(url); toast('Challenge link copied!'); }); } else { copy(url); toast('Challenge link copied!'); } }
 
 /* --- input --- */
-function tapStart(e){ musicUnlock(); if(e&&e.target&&e.target.closest&&(e.target.closest('#title')||e.target.closest('#intro')||e.target.closest('#dead')||e.target.closest('#locker')||e.target.closest('#profile')||e.target.closest('#board')||e.target.closest('#mute'))) return;
+function tapStart(e){ musicUnlock(); if(e&&e.target&&e.target.closest&&(e.target.closest('#title')||e.target.closest('#intro')||e.target.closest('#dead')||e.target.closest('#locker')||e.target.closest('#profile')||e.target.closest('#board')||e.target.closest('#duel')||e.target.closest('#duelend')||e.target.closest('#mute'))) return;
   if(mode==='playing'&&performance.now()-startGuard>120){ const y=(e.touches&&e.touches[0])?e.touches[0].clientY:e.clientY; handleTap(0,y); } }
 window.addEventListener('pointerdown',tapStart);
 window.addEventListener('keydown',e=>{ const lanes={'Digit1':0,'Digit2':1,'Digit3':2,'Digit4':3,'KeyQ':0,'KeyW':1,'KeyE':2,'KeyR':3};
@@ -598,7 +703,8 @@ el('mute').addEventListener('click',e=>{ e.stopPropagation(); toggleMute(); });
 /* --- main loop --- */
 function frame(now){ let dt=(now-last)/1000; if(dt>0.05) dt=0.05; last=now; bgPhase+=dt;
   if(mode==='playing'&&S&&!S.over){ S.gt=SIM.q5(S.gt+dt*timeScale); S.sim.advance(S.gt);
-    if(!S.over&&mode==='playing'){ const lbl=S.kind==='daily'?('DAILY #'+SIM.dayNumber()):S.kind==='challenge'?'CHALLENGE':'ENDLESS'; el('box').innerHTML=lbl+'<br>BOX '+SIM.levelAt(S.gt); } }
+    if(!S.over&&mode==='playing'){ const bx=SIM.levelAt(S.gt); const lbl=S.kind==='daily'?('DAILY #'+SIM.dayNumber()):S.kind==='challenge'?'CHALLENGE':S.kind==='duel'?'DUEL':'ENDLESS'; el('box').innerHTML=lbl+'<br>BOX '+bx;
+      if(bx!==S.lastBox){ S.lastBox=bx; if(bx>0){ boxStab(); showBig('BOX '+bx,UI.accent); shake=Math.min(18,shake+6); } } } }
   updateParts(dt); updatePopups(dt);
   if(shake>0) shake=Math.max(0,shake-dt*60); if(flashA>0) flashA=Math.max(0,flashA-dt*1.7);
   if(timeScale<1) timeScale=Math.min(1,timeScale+dt*1.9); if(bigT>0) bigT=Math.max(0,bigT-dt*1.5);
@@ -656,7 +762,7 @@ async function loadBoard(){ const list=el('lblist'); list.innerHTML='loading&hel
     else { el('lbme').textContent='Set a tag in PROFILE to appear here.'; }
   }catch(e){ list.innerHTML='<div class="lbrow"><span class="nm">Leaderboard unavailable (offline?)</span></div>'; }
 }
-async function submitScore(){ el('rank').textContent=''; if(!S||S.kind==='challenge') return; const h=cleanHandle(playerName);
+async function submitScore(){ el('rank').textContent=''; if(!S||S.kind==='challenge'||S.kind==='duel') return; const h=cleanHandle(playerName);
   if(!h){ el('rank').textContent='Set a tag to post this score — tap PROFILE'; return; }
   if(!S.log||!S.log.length) return; const board=S.kind==='daily'?'daily':'alltime';
   el('rank').textContent='posting score…';
@@ -675,6 +781,144 @@ el('board-close').addEventListener('click',e=>{ e.stopPropagation(); closeBoard(
 el('tab-daily').addEventListener('click',e=>{ e.stopPropagation(); setTab('daily'); });
 el('tab-all').addEventListener('click',e=>{ e.stopPropagation(); setTab('all'); });
 
+/* --- DUEL (arcade-pvp · PVP_PROTOCOL.md Shape A — server-authoritative) ---
+   The client NEVER submits a score: it queues, receives the server seed at
+   `active`, plays ONE run seeded by it, and POSTs the raw input log. The
+   arcade-pvp worker re-simulates both logs with the build-injected sim
+   (arcade-pvp/sims/fuse.js — generated from sim.js by api/build-pvp.js). */
+const PVP_API='https://arcade-pvp.clutchpbcfo.workers.dev';
+const DUEL={ id:null, token:null, lastToken:null, role:null, opp:null, seed:null, deadlineTs:0, pollT:null, phase:'idle', inputs:null, retried:false, myScore:null, started:false };
+/* MUST match seedToUint32 in arcade-pvp/sims/fuse.js: seed string used VERBATIM. */
+function duelSeed32(seed){ return SIM.hashSeed(String(seed)); }
+
+function duelStopPoll(){ if(DUEL.pollT){ clearTimeout(DUEL.pollT); DUEL.pollT=null; } }
+function duelReset(){ duelStopPoll(); DUEL.id=null; DUEL.token=null; DUEL.role=null; DUEL.opp=null; DUEL.seed=null; DUEL.deadlineTs=0; DUEL.phase='idle'; DUEL.inputs=null; DUEL.retried=false; DUEL.myScore=null; DUEL.started=false; }
+function duelStatus(txt,sub,pulse){ const s=el('duel-status'); s.textContent=txt||''; s.classList.toggle('pulse-txt',!!pulse); el('duel-sub').textContent=sub||''; }
+
+function openDuel(){ mode='duel'; sizzleKillAll(); ['title','intro','dead','locker','profile','board','duelend','hud'].forEach(id=>el(id).classList.add('hidden')); el('duel').classList.remove('hidden');
+  el('duel-fuseline').style.visibility='hidden'; el('duel-name-note').textContent='';
+  el('duel-go').textContent='FIND A DUEL'; el('duel-go').classList.remove('hidden');
+  const need=cleanHandle(playerName).length<3;
+  el('duel-name-row').classList.toggle('hidden',!need);
+  if(need){ el('duel-name').value=playerName||''; duelStatus('PICK A TAG TO DUEL','it carries your duels and scores'); setTimeout(()=>{ try{ el('duel-name').focus(); }catch(e){} },60); }
+  else duelStatus('READY, @'+cleanHandle(playerName).toUpperCase(),'same seed for both — cut closer than they dare'); }
+function closeDuel(){ duelCancel(); duelReset(); gotoTitle(); }
+
+async function duelQueue(){
+  if(!el('duel-name-row').classList.contains('hidden')){
+    const h=cleanHandle(el('duel-name').value);
+    if(h.length<3){ el('duel-name-note').textContent='3-15 letters/numbers, no spaces'; return; }
+    playerName=h; saveName(h); el('duel-name-row').classList.add('hidden'); refreshTitleProfile();
+  }
+  const h=cleanHandle(playerName); if(h.length<3) return openDuel();
+  const keepToken=DUEL.lastToken||null; // rematch keeps identity (worker supports token reuse)
+  duelReset(); DUEL.lastToken=keepToken; DUEL.phase='queueing';
+  el('duel-go').classList.add('hidden'); el('duel-fuseline').style.visibility='visible';
+  duelStatus('FINDING AN OPPONENT…','same box · best verified score wins',true);
+  try{
+    const body={game:'fuse',name:h}; if(DUEL.lastToken) body.token=DUEL.lastToken;
+    const r=await fetch(PVP_API+'/api/duel/queue',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!r.ok) throw new Error('queue_'+r.status);
+    const d=await r.json();
+    if(!d||!d.duelId||!d.token) throw new Error('bad_queue_response');
+    DUEL.id=d.duelId; DUEL.token=d.token; DUEL.lastToken=d.token; DUEL.role=d.role||null; DUEL.phase='waiting';
+    if(d.opponent){ const o=cleanHandle(String(d.opponent)); DUEL.opp=o||String(d.opponent).slice(0,15); }
+    duelPoll(d.waiting?1100:250);
+  }catch(e){
+    DUEL.phase='offline'; el('duel-fuseline').style.visibility='hidden';
+    el('duel-go').textContent='RETRY'; el('duel-go').classList.remove('hidden');
+    duelStatus('PVP IS OFFLINE','solo modes still work — try again in a bit');
+  }
+}
+function duelPoll(ms){ duelStopPoll(); DUEL.pollT=setTimeout(duelTick,ms||1200); }
+async function duelTick(){
+  if(!DUEL.id||!DUEL.token||DUEL.phase==='playing'||DUEL.phase==='vs') return;
+  let d=null;
+  try{ const r=await fetch(PVP_API+'/api/duel/state?d='+encodeURIComponent(DUEL.id)+'&t='+encodeURIComponent(DUEL.token)); d=await r.json(); }
+  catch(e){ if(DUEL.phase==='waiting'||DUEL.phase==='postsubmit') duelPoll(2500); return; }
+  if(!d||d.error){ duelPoll(2000); return; }
+  if(d.opponent){ const o=cleanHandle(String(d.opponent)); DUEL.opp=o||String(d.opponent).slice(0,15); }
+  if(d.deadlineTs) DUEL.deadlineTs=d.deadlineTs;
+  if(d.status==='waiting'){ duelPoll(1200); return; }
+  if(d.status==='active'){
+    if(DUEL.phase==='postsubmit'){ duelEndNote(); duelPoll(1400); return; }
+    if(!DUEL.started&&d.seed!=null){ DUEL.seed=String(d.seed); duelVs(); } else duelPoll(1200);
+    return; }
+  if(d.status==='resolved'){ duelResolved(d); return; }
+  if(d.status==='expired'){ duelExpired(); return; }
+  duelPoll(1600);
+}
+function duelVs(){ DUEL.started=true; DUEL.phase='vs'; duelStopPoll();
+  duelStatus('MATCHED — VS @'+String(DUEL.opp||'???').toUpperCase(),'same box · same fuses · cut it closer',false);
+  blip(scaleFreq(4,1),0.18,'triangle',0.22); buzz(20);
+  setTimeout(()=>{ if(DUEL.phase!=='vs') return; DUEL.phase='playing'; pendingChallenge=null; beginRun('duel',duelSeed32(DUEL.seed)); },1100); }
+
+/* after death: ship the INPUT LOG (never a score), then wait on the verdict */
+function duelSubmitRun(run){
+  DUEL.phase='postsubmit'; DUEL.myScore=run.score; DUEL.inputs=S.log.slice(); DUEL.retried=false;
+  showDuelEnd(); duelVerdict('RUN SUBMITTED','#fff');
+  el('duelend-sub').textContent='server is verifying your run…';
+  duelRows(run.score,null,false,false);
+  duelPostInputs();
+}
+async function duelPostInputs(){
+  try{
+    const r=await fetch(PVP_API+'/api/duel/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({duelId:DUEL.id,token:DUEL.token,inputs:DUEL.inputs})});
+    if(!(r.ok||r.status===409)) throw new Error('submit_'+r.status); // 409 = already in (replay-guard) — fine
+    let d=null; try{ d=await r.json(); }catch(e){}
+    el('duelend-sub').textContent='waiting for @'+(DUEL.opp||'opponent')+'…';
+    duelPoll(d&&(d.resolved||d.status==='resolved'||d.winner)?200:1300);
+  }catch(e){
+    if(!DUEL.retried){ DUEL.retried=true; el('duelend-sub').textContent='retrying…'; setTimeout(duelPostInputs,1800); return; }
+    duelVerdict('CONNECTION LOST','#FF6A4D');
+    el('duelend-sub').textContent='still checking the duel in the background…';
+    duelPoll(2500); // state poll may still find it resolved (or expired → forfeit)
+  }
+}
+function showDuelEnd(){ mode='duelend'; sizzleKillAll(); ['duel','hud','dead','title','intro','locker','profile','board'].forEach(id=>el(id).classList.add('hidden')); el('duelend').classList.remove('hidden'); el('duelend-note').textContent=''; }
+function duelVerdict(txt,col){ const v=el('duel-verdict'); v.textContent=txt; v.style.color=col||'#fff'; }
+function duelRows(my,op,meWin,opWin){
+  const me=el('drow-me'),opp=el('drow-op');
+  me.querySelector('.dnm').textContent='@'+(cleanHandle(playerName)||'you')+' (you)';
+  me.querySelector('.dsc').textContent=(my==null?'—':String(my));
+  opp.querySelector('.dnm').textContent='@'+(DUEL.opp||'opponent');
+  opp.querySelector('.dsc').textContent=(op==null?'…':String(op));
+  me.classList.toggle('win',!!meWin); opp.classList.toggle('win',!!opWin); }
+function duelEndNote(){ if(!DUEL.deadlineTs) return; const s=Math.max(0,Math.ceil((DUEL.deadlineTs-Date.now())/1000)); el('duelend-note').textContent='auto-resolves in '+s+'s if they no-show'; }
+function duelResolved(d){
+  duelStopPoll(); DUEL.phase='resolved'; showDuelEnd();
+  /* worker resolved shape: { winner:'p1'|'p2'|'draw'|null, reason,
+       scores:{p1:{name,score},p2:{name,score}}, you:role, youWin:'win'|'loss'|'draw'|null } */
+  const role=d.you||DUEL.role, other=role==='p1'?'p2':(role==='p2'?'p1':null);
+  const cell=v=>(v&&typeof v==='object')?v.score:(typeof v==='number'?v:null);
+  const sc=d.scores||{};
+  let my=role?cell(sc[role]):null, op=other?cell(sc[other]):null;
+  if(my==null) my=DUEL.myScore;
+  if(other&&sc[other]&&sc[other].name&&!DUEL.opp) DUEL.opp=cleanHandle(String(sc[other].name))||String(sc[other].name).slice(0,15);
+  const noShow=/forfeit|noshow|no_show|timeout|stale/i.test(String(d.reason||''));
+  let verdict=d.youWin!=null?d.youWin:null;
+  if(verdict==null&&d.winner&&role) verdict=d.winner==='draw'?'draw':(d.winner===role?'win':'loss');
+  if(verdict==null&&my!=null&&op!=null) verdict=my>op?'win':(my<op?'loss':'draw');
+  const opShow=(op==null)?'—':op;
+  if(verdict==='draw'){ duelVerdict('DEAD HEAT','#FFC83D'); el('duelend-sub').textContent='identical verified scores — run it back'; duelRows(my,opShow,false,false); }
+  else if(verdict==='win'){ duelVerdict('YOU WIN','#7CFF3D'); el('duelend-sub').textContent=noShow?'opponent no-showed — a W is a W':'closer cuts, cooler nerves'; duelRows(my,opShow,true,false); buzz([20,30,60]); }
+  else if(verdict==='loss'){ duelVerdict('YOU LOSE','#FF6A4D'); el('duelend-sub').textContent=noShow?'your run never reached the server in time':'they cut it closer — run it back'; duelRows(my,opShow,false,true); buzz(30); }
+  else { duelVerdict('RESOLVED','#fff'); el('duelend-sub').textContent='duel resolved'; duelRows(my,opShow,false,false); }
+  musicMenu(); }
+function duelExpired(){ duelStopPoll(); DUEL.phase='expired'; showDuelEnd();
+  duelVerdict('DUEL EXPIRED','#FF6A4D'); el('duelend-sub').textContent='nobody finished in time — no result';
+  duelRows(DUEL.myScore,null,false,false); musicMenu(); }
+function duelCancel(){ if(DUEL.id&&DUEL.token&&(DUEL.phase==='waiting'||DUEL.phase==='queueing')){
+  try{ fetch(PVP_API+'/api/duel/cancel',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({duelId:DUEL.id,token:DUEL.token})}); }catch(e){} } }
+function duelRematch(){ duelReset(); openDuel(); if(cleanHandle(playerName).length>=3) duelQueue(); }
+
+el('duel-btn').addEventListener('click',e=>{ e.stopPropagation(); openDuel(); });
+el('duel-go').addEventListener('click',e=>{ e.stopPropagation(); duelQueue(); });
+el('duel-cancel').addEventListener('click',e=>{ e.stopPropagation(); closeDuel(); });
+el('duel-name').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); duelQueue(); } });
+el('duel-rematch').addEventListener('click',e=>{ e.stopPropagation(); duelRematch(); });
+el('duel-menu').addEventListener('click',e=>{ e.stopPropagation(); duelReset(); gotoTitle(); });
+
 /* --- boot --- */
 resize(); initDust(); M.muted=loadMuted(); updateMuteBtn();
 el('dayno').textContent=SIM.dayNumber(); el('tbest').textContent=best;
@@ -683,6 +927,8 @@ refreshTitleProfile();
 if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{})); }
 pendingChallenge=parseChallenge();
 if(pendingChallenge){ mode='intro'; el('title').classList.add('hidden'); el('intro').classList.remove('hidden'); const who=(pendingChallenge.n||'A challenger'); const day=pendingChallenge.k==='daily'&&pendingChallenge.d?(' on Daily Box #'+pendingChallenge.d):''; el('introtxt').innerHTML=who+' dares you to beat <b>'+pendingChallenge.t+'</b>'+day+'.<br>Same box. Same fuses. Your move.'; }
+/* duel button reveals when the arcade-pvp worker is reachable — remove this gate once PvP ships (parallel session's lane) */
+try{ fetch(PVP_API+'/api/duel/state?d=boot').then(function(){ var b=document.getElementById('duel-btn'); if(b) b.style.display=''; }).catch(function(){}); }catch(e){}
 window.FUSE_DEBUG={ beginRun, get S(){return S;}, get mode(){return mode;}, handleTap, SIM };
 requestAnimationFrame(frame);
 </script>
